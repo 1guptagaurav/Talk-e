@@ -17,13 +17,13 @@ const chatSchema = new mongoose.Schema(
         type:mongoose.Schema.Types.ObjectId,
         ref:"Message"
     },
-    isGroupAdmin: {
-      type: Boolean,
-      default: false,
+    groupAdmin: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
     },
   },
   { timestamps: true }
 );
 
 
-export default Chat= mongoose.model("Chat",chatSchema)
+export const Chat= mongoose.model("Chat",chatSchema);
