@@ -18,4 +18,4 @@ router.route("/rename").put(verifyJWT, renameGroupName);
 router.route("/add").put(verifyJWT, addNewUser);
 router.route("/remove").put(verifyJWT, removeUser);
 
-export { router };
+export default router ;

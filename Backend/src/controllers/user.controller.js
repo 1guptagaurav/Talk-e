@@ -15,13 +15,13 @@ const generateAccessAndRefreshToken = async (id) => {
 
 const registerUser = asyncHandler(async (req, res) => {
   const { fullname, email, password } = req.body;
+  console.log("i am here")
   if (
     [fullname, email, password].some((field) => !field || field?.trim() === "")
   ) {
     throw new ApiError(403,"All fields are necessary");
     // return res.status(403).json({ message: "All fields are required" });
   }
-
   const existedUser = await User.findOne({ email });
   if (existedUser) {
     throw new ApiError(401, "User already registered");

@@ -58,7 +58,7 @@ function SignUp() {
       // Call the function when the component mounts
       
       const res = await axios.post(
-        "http://localhost:8000/api/register",
+        "http://localhost:8000/api/user/register",
         {
           fullname,
           email,
@@ -69,7 +69,6 @@ function SignUp() {
       ).then((response)=>{
         toast({
           title: "Something went right",
-          description: response.data.data,
           status: "success",
           duration: "4000",
           isClosable: true,
