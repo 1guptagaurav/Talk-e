@@ -10,6 +10,7 @@ import {
 import React from "react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import useChat from "../../Context/ContextApi";
 
 function Login() {
   const [email, setemail] = useState();
@@ -17,10 +18,13 @@ function Login() {
   const [show, setShow] = useState(false);
   const navigate = useNavigate(); 
   const postDetails = (pic) => {};
-  const submitHandler = (e) => {
-    e.preventDefault();
-    navigate("/chats");
-  };
+  const { user, setUservalue } = useChat();
+   const submitHandler = (e) => {
+     e.preventDefault();
+     const users=setUservalue({email,password})
+     localStorage.setItem("user", JSON.stringify(users));
+     navigate("/chats");
+   };
   return (
     <div>
       <VStack spacing="5px">

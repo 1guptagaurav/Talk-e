@@ -4,11 +4,11 @@ import { useNavigate } from "react-router-dom";
 
 export const ChatContext = createContext({
   user: null,
-  setUser: () => {},
+  setUservalue: () => {},
 });
 
 export const ChatProvider=ChatContext.Provider
 
-export default function useChat(){
-    return useContext(ChatContext)
+export default function useChat() {
+  return useContext(ChatContext);
 }
