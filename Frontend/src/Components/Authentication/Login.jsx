@@ -9,15 +9,18 @@ import {
 } from "@chakra-ui/react";
 import React from "react";
 import { useState } from "react";
-
+import { useNavigate } from "react-router-dom";
 
 function Login() {
   const [email, setemail] = useState();
   const [password, setPassword] = useState();
   const [show, setShow] = useState(false);
-
+  const navigate = useNavigate(); 
   const postDetails = (pic) => {};
-  const submitHandler = () => {};
+  const submitHandler = (e) => {
+    e.preventDefault();
+    navigate("/chats");
+  };
   return (
     <div>
       <VStack spacing="5px">
