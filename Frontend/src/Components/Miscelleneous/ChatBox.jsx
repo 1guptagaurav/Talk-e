@@ -1,9 +1,12 @@
-import React from 'react'
+import { Tooltip,Button,Box } from '@chakra-ui/react';
+import React, { useState } from 'react'
 
 function ChatBox() {
   return (
-    <div>ChatBox</div>
-  )
+    <>
+      ChatBox
+    </>
+  );
 }
 
 export default ChatBox
