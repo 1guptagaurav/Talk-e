@@ -3,8 +3,8 @@ import React, { useEffect, useState } from 'react'
 import useChat from "../Context/ContextApi"
 import {Box, Flex} from "@chakra-ui/react"
 import SideBar from '../Components/Miscelleneous/SideBar'
-import ChatBox from '../Components/ChatBox'
-import MyChats from '../Components/MyChats'
+import ChatBox from '../Components/Miscelleneous/ChatBox'
+import MyChats from '../Components/Miscelleneous/MyChats'
 import { useNavigate } from 'react-router-dom'
 
 function ChatPage() {
