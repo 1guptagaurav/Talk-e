@@ -6,17 +6,17 @@ import { HomePage } from "./Pages/Homepage.jsx";
 import { ChatProvider } from "./Context/ContextApi.jsx";
 import {ChatPage} from "./Pages/ChatPage.jsx";
 function App() {
-  const [user, setUser] = useState();
+  const [user, setUser] = useState(() => {
+    // Initialize user state from localStorage if available
+    const savedUser = localStorage.getItem("user");
+    return savedUser ? JSON.parse(savedUser) : null;
+  });
   const navigate = useNavigate(); 
   const setUservalue=(user)=>{
     setUser(user)
     return user;
   }
-  useEffect(() => {
-    const userInfo = JSON.parse(localStorage.getItem("user"));
-    console.log(userInfo)
-    if (!userInfo) navigate("/");
-  }, [navigate]);
+  
   return (
     <ChatProvider value={{ user, setUservalue }}>
       <div className="App">
