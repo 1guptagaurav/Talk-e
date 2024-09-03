@@ -12,11 +12,13 @@ import {
 import Login from '../Components/Authentication/Login.jsx';
 import SignUp from "../Components/Authentication/SignUp.jsx";
 import {useNavigate} from "react-router-dom"
+import useChat from '../Context/ContextApi.jsx';
 function HomePage() {
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
+    const savedUser = useChat()
+    console.log(savedUser); 
   useEffect(() => {
-    const userInfo = JSON.parse(localStorage.getItem("user"));
-    if (userInfo) navigate("/chats");
+    if (savedUser) navigate("/chats");
   }, [navigate]);
   return (
     <Container maxW="xl" centerContent>

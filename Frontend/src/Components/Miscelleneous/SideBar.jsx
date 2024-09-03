@@ -14,25 +14,35 @@ import {
   DrawerHeader,
   Input,
 } from "@chakra-ui/react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { BellIcon, ChevronDownIcon } from "@chakra-ui/icons";
 import { Button } from "@chakra-ui/button";
 import useChat from "../../Context/ContextApi";
 import { Avatar } from "@chakra-ui/react";
 import ProfileModal from "./ProfileModal";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 function SideBar() {
   const [search, setSearch] = useState("");
   const [result, setResult] = useState([]);
   const [loading, setLoading] = useState(false);
   const [loadingChat, setLoadingChat] = useState();
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const { user } = useChat(() => {
-    const savedUser = localStorage.getItem("user");
-    return savedUser ? JSON.parse(savedUser) : null;
-  });
+  const user = localStorage.getItem("user");
   const navigate = useNavigate();
-  const logouthandler = () => {
+  useEffect(() => {
+    if (!user) navigate("/");
+  }, [navigate]);
+  
+  
+  const logouthandler = async() => {
+    await axios.post(
+      "http://localhost:8000/api/user/logout",
+      {},
+      {
+        withCredentials: true,
+      }
+    );
     localStorage.removeItem("user");
     navigate("/");
   };
@@ -70,8 +80,8 @@ function SideBar() {
               <Avatar
                 size="sm"
                 cursor="pointer"
-                name={user.name}
-                src={user.pic}
+                // name={user.fullname}
+                // src={user.pic}
               />
             </MenuButton>
             <MenuList>

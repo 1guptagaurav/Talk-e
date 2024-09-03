@@ -11,6 +11,7 @@ import React from "react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import useChat from "../../Context/ContextApi";
+import axios from "axios";
 
 function Login() {
   const [email, setemail] = useState();
@@ -18,12 +19,19 @@ function Login() {
   const [show, setShow] = useState(false);
   const navigate = useNavigate(); 
   const postDetails = (pic) => {};
-  const { user, setUservalue } = useChat();
-   const submitHandler = (e) => {
+  const { setUser } = useChat();
+   const submitHandler =async (e) => {
      e.preventDefault();
-     const users=setUservalue({email,password})
-     localStorage.setItem("user", JSON.stringify(users));
-     navigate("/chats");
+     const response =await axios.post("http://localhost:8000/api/user/login",{
+          email,
+          password
+        });
+        const {user, accessToken,refreshToken}=response.data.data
+        localStorage.setItem("user", JSON.stringify(user));
+        setUser(user)
+         document.cookie = `accessToken=${accessToken}; path=/;`;
+         document.cookie = `refreshToken=${refreshToken}; path=/;`;
+        navigate("/chats");
    };
   return (
     <div>

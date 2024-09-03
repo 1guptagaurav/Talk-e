@@ -24,14 +24,14 @@ const {isOpen, onOpen, onClose}=useDisclosure()
             fontFamily={"Work sans"}
             display={"flex"}
             justifyContent={"center"}
-          >{user.email}</ModalHeader>
+          ></ModalHeader>
           <ModalCloseButton />
           <ModalBody>
             <Image
             borderRadius={"full"}
             boxSize={"150px"}
-            src={user.pic}
-            alt={user.email}
+            // src={user.pic}
+            // alt={user.email}
             />
           </ModalBody>
 
