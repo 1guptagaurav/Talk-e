@@ -35,9 +35,9 @@ function SideBar() {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const user = localStorage.getItem("user");
   const navigate = useNavigate();
-  useEffect(() => {
-    if (!user) navigate("/");
-  }, [navigate]);
+  // useEffect(() => {
+  //   if (!user) navigate("/");
+  // }, [navigate]);
 
   const accessChat = async (userId) => {
     try {

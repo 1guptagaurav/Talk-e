@@ -8,14 +8,22 @@ import MyChats from "../Components/Miscelleneous/MyChats";
 import { useNavigate } from "react-router-dom";
 
 function ChatPage() {
+  const [isUserLoaded, setIsUserLoaded] = useState(false);
   const navigate = useNavigate();
-  const user =useChat();
-  useEffect(() => {
-    if (!user) navigate("/");
-  }, [navigate]);
+   useEffect(() => {
+     const user = localStorage.getItem("user");
+     if (!user) {
+       navigate("/");
+     } else {
+       setIsUserLoaded(true); // User is found, allow rendering
+     }
+   }, [navigate]);
+  if (!isUserLoaded) {
+    return null; // Prevent rendering until user is checked
+  }
   return (
     <div style={{ width: "100%" }}>
-      {<SideBar />}
+      { < SideBar />}
       <Box
         display={"flex"}
         justifyContent={"space-between"}

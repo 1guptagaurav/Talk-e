@@ -16,7 +16,7 @@ import useChat from '../Context/ContextApi.jsx';
 function HomePage() {
   const navigate = useNavigate();
     const savedUser = useChat()
-    console.log(savedUser); 
+    console.log(savedUser);
   useEffect(() => {
     if (savedUser) navigate("/chats");
   }, [navigate]);
