@@ -1,6 +1,7 @@
 import { asyncHandler } from "../utils/AsyncHandler.js";
 import {Chat} from "../models/chat.model.js"
 import { ApiError } from "../utils/ApiError.js";
+import { User } from "../models/user.models.js";
 
 
 
