@@ -13,6 +13,8 @@ import {
   useDisclosure,
   DrawerHeader,
   Input,
+  position,
+  useToast,
 } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
 import { BellIcon, ChevronDownIcon } from "@chakra-ui/icons";
@@ -22,10 +24,13 @@ import { Avatar } from "@chakra-ui/react";
 import ProfileModal from "./ProfileModal";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import UserListitem from "../UserAvatar/UserListitem";
 function SideBar() {
+  const toast = useToast();
   const [search, setSearch] = useState("");
   const [result, setResult] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [selecedChat, setSelectedChat] = useState();
   const [loadingChat, setLoadingChat] = useState();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const user = localStorage.getItem("user");
@@ -33,9 +38,31 @@ function SideBar() {
   useEffect(() => {
     if (!user) navigate("/");
   }, [navigate]);
-  
-  
-  const logouthandler = async() => {
+
+  const accessChat = async (userId) => {
+    try {
+      setLoadingChat(true);
+      const config = {
+        headers: {
+          "content-type": "application/json",
+        },
+        withCredentials: true,
+      };
+
+      await axios.post("http://localhost:8000/api/chat", { userId }, config)
+        .then((data)=>setSelectedChat(data))
+        setLoadingChat(false);
+        onClose()
+    } catch (error) {toast({
+      title: "unable to fetch chat",
+      status: "warning",
+      duration: "4000",
+      isClosable: true,
+      position: "top-left",
+    });}
+  };
+
+  const logouthandler = async () => {
     await axios.post(
       "http://localhost:8000/api/user/logout",
       {},
@@ -46,7 +73,30 @@ function SideBar() {
     localStorage.removeItem("user");
     navigate("/");
   };
-  const submitHandler = () => {};
+  const submitHandler = () => {
+    if (!search) {
+      toast({
+        title: "Please Enter something in search",
+        status: "warning",
+        duration: "4000",
+        isClosable: true,
+        position: "top-left",
+      });
+      return;
+    }
+    setLoading(true);
+    // const config = {
+    //   headers: {
+    //     Authorization: `Bearer ${user}`,
+    //   },
+    // }
+    const res = axios
+      .get(`http://localhost:8000/api/user?search=${search}`, {
+        withCredentials: true,
+      })
+      .then((response) => setResult(response.data));
+    setLoading(false);
+  };
   return (
     <>
       <Box
@@ -80,8 +130,8 @@ function SideBar() {
               <Avatar
                 size="sm"
                 cursor="pointer"
-                // name={user.fullname}
-                // src={user.pic}
+                name={user.fullname}
+                src={user.pic}
               />
             </MenuButton>
             <MenuList>
@@ -107,6 +157,15 @@ function SideBar() {
               />
               <Button onClick={submitHandler}>Go</Button>
             </Box>
+            <span>
+              {result.map((user) => (
+                <UserListitem
+                  key={user._id}
+                  user={user}
+                  handleFunction={() => accessChat(user._id)}
+                />
+              ))}
+            </span>
           </DrawerBody>
         </DrawerContent>
       </Drawer>

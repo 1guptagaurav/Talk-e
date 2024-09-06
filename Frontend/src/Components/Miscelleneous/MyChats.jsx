@@ -1,9 +1,11 @@
-import React from 'react'
+import React, { useState } from 'react'
 
 function MyChats() {
-  return (
-    <div>MyChats</div>
-  )
+  const [loggedUser,setLoggedUser]=useState()
+  
+  return 
+    <>
+    </>
 }
 
 export default MyChats
