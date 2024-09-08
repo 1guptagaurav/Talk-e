@@ -45,13 +45,12 @@ export const accessChat = asyncHandler(async (req, res) => {
     res.status(400)
     throw new Error(error.message);
   }
-
 });
 
 
 export const fetchChats=asyncHandler(async(req,res)=>{
   try {
-    Chat.find({ users: { $elemMatch: req.user._id } })
+    Chat.find({ users: { $elemMatch: {$eq:req.user._id} } })
       .populate("users", "-password")
       .populate("latestMessage")
       .populate("groupAdmin","-password")
@@ -61,6 +60,7 @@ export const fetchChats=asyncHandler(async(req,res)=>{
           path: "latestMessage.sender",
           select: "fullname pic email",
         });
+        res.status(200).send(results);
       })
   } catch (error) {
     throw new ApiError(401,"Unauthorized Access")
