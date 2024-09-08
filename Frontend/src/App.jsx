@@ -6,13 +6,12 @@ import { HomePage } from "./Pages/Homepage.jsx";
 import { ChatProvider } from "./Context/ContextApi.jsx";
 import {ChatPage} from "./Pages/ChatPage.jsx";
 function App() {
-  const [user, setUser] =useState()
   
   return (
     <ChatProvider>
       <div className="App">
         <Routes>
-          <Route path="/" element={<HomePage />} />
+          <Route path="/" element={<HomePage />}/>
           <Route path="/chats" element={<ChatPage />} />
         </Routes>
       </div>

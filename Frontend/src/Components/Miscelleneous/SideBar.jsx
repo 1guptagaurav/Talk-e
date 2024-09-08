@@ -30,10 +30,9 @@ function SideBar() {
   const [search, setSearch] = useState("");
   const [result, setResult] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [selecedChat, setSelectedChat] = useState();
   const [loadingChat, setLoadingChat] = useState();
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const user = localStorage.getItem("user");
+  const { user, setSelectedChats, chats, setChats } = useChat();
   const navigate = useNavigate();
   // useEffect(() => {
   //   if (!user) navigate("/");
@@ -49,17 +48,21 @@ function SideBar() {
         withCredentials: true,
       };
 
-      await axios.post("http://localhost:8000/api/chat", { userId }, config)
-        .then((data)=>setSelectedChat(data))
-        setLoadingChat(false);
-        onClose()
-    } catch (error) {toast({
-      title: "unable to fetch chat",
-      status: "warning",
-      duration: "4000",
-      isClosable: true,
-      position: "top-left",
-    });}
+      await axios
+        .post("http://localhost:8000/api/chat", { userId }, config)
+        .then((data) => setSelectedChats(data));
+      if (!chats.find((c) => c._id === data._id)) setChats([data, ...chats]);
+      setLoadingChat(false);
+      onClose();
+    } catch (error) {
+      toast({
+        title: "unable to fetch chat",
+        status: "warning",
+        duration: "4000",
+        isClosable: true,
+        position: "top-left",
+      });
+    }
   };
 
   const logouthandler = async () => {
@@ -90,7 +93,7 @@ function SideBar() {
     //     Authorization: `Bearer ${user}`,
     //   },
     // }
-    const res = axios
+    axios
       .get(`http://localhost:8000/api/user?search=${search}`, {
         withCredentials: true,
       })
@@ -130,8 +133,8 @@ function SideBar() {
               <Avatar
                 size="sm"
                 cursor="pointer"
-                name={user.fullname}
-                src={user.pic}
+                name={user?.fullname}
+                src={user?.pic}
               />
             </MenuButton>
             <MenuList>

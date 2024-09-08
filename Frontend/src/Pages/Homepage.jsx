@@ -17,9 +17,9 @@ function HomePage() {
   const navigate = useNavigate();
     const savedUser = useChat()
     console.log(savedUser);
-  useEffect(() => {
-    if (savedUser) navigate("/chats");
-  }, [navigate]);
+  // useEffect(() => {
+  //   if (savedUser) navigate("/chats");
+  // }, [navigate]);
   return (
     <Container maxW="xl" centerContent>
       <Box
@@ -33,7 +33,7 @@ function HomePage() {
         borderWidth="1px"
         textAlign="center"
       >
-        <Text fontSize="4xl">Talk-A-Tive</Text>
+        <Text fontSize="4xl">Talk-e</Text>
       </Box>
       <Box bg="white" w="100%" p={4} borderRadius="lg" borderWidth="1px">
         <Tabs variant="soft-rounded" colorScheme="green">

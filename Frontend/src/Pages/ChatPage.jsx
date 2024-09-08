@@ -8,22 +8,11 @@ import MyChats from "../Components/Miscelleneous/MyChats";
 import { useNavigate } from "react-router-dom";
 
 function ChatPage() {
-  const [isUserLoaded, setIsUserLoaded] = useState(false);
   const navigate = useNavigate();
-   useEffect(() => {
-     const user = localStorage.getItem("user");
-     if (!user) {
-       navigate("/");
-     } else {
-       setIsUserLoaded(true); // User is found, allow rendering
-     }
-   }, [navigate]);
-  if (!isUserLoaded) {
-    return null; // Prevent rendering until user is checked
-  }
+  const user = localStorage.getItem("user");
   return (
     <div style={{ width: "100%" }}>
-      { < SideBar />}
+      { user && < SideBar />}
       <Box
         display={"flex"}
         justifyContent={"space-between"}
@@ -31,8 +20,8 @@ function ChatPage() {
         h={"91.5vh"}
         p={"10px"}
       >
-        {<ChatBox />}
-        {<MyChats />}
+        {user && <MyChats />}
+        {user && <ChatBox />}
       </Box>
     </div>
   );
