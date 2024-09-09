@@ -121,7 +121,7 @@ const logoutUser = asyncHandler(async (req, res) => {
 const getAllUser=asyncHandler(async(req,res)=>{
   const keyword=req.query.search ? {
     $or:[
-      {name:{$regex:req.query.search,$options:"i"}},
+      {fullname:{$regex:req.query.search,$options:"i"}},
       {email:{$regex:req.query.search,$options:"i"}}
     ]
   }:{}

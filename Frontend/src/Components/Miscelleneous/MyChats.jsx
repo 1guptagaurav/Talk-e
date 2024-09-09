@@ -5,6 +5,7 @@ import axios from "axios";
 import { json } from "react-router-dom";
 import { AddIcon } from "@chakra-ui/icons";
 import { Chat } from "../../../../Backend/src/models/chat.model";
+import GroupChatModal from "./GroupChatModal";
 
 function MyChats() {
   const [loggedUser, setLoggedUser] = useState();
@@ -57,45 +58,44 @@ function MyChats() {
         alignItems={"center"}
       >
         MyChats
-        <Button
-          display={"flex"}
-          fontSize={{ base: "17px", md: "10px", lg: "17px" }}
-          rightIcon={<AddIcon />}
-        >
-          Add to Group
-        </Button>
+        <GroupChatModal>
+          <Button
+            display={"flex"}
+            fontSize={{ base: "17px", md: "10px", lg: "17px" }}
+            rightIcon={<AddIcon />}
+          >
+            Add to Group
+          </Button>
+        </GroupChatModal>
       </Box>
-      <Box display={"flex"}
-      flexDir={"column"}
-      p={3}
-      bg="#F8F8F8"
-      w={"100%"}
-      h={"100%"}
-      borderRadius={"lg"}
-      overflowY={"hideen"}
+      <Box
+        display={"flex"}
+        flexDir={"column"}
+        p={3}
+        bg="#F8F8F8"
+        w={"100%"}
+        h={"100%"}
+        borderRadius={"lg"}
+        overflowY={"hideen"}
       >
         <Stack overflowY="scroll">
-          {
-            chats.map((chat)=>(
-              <Box
-              onClick={()=>setSelectedChats(chats)}
+          {chats.map((chat) => (
+            <Box
+              onClick={() => setSelectedChats(chat)}
               cursor={"pointer"}
-              bg={selectedChats===chat?"#38B2AC":"#E8E8E8"}
+              bg={selectedChats === chat ? "#38B2AC" : "#E8E8E8"}
               px={3}
               py={2}
               borderRadius={"lg"}
               key={chat._id}
-              color={selectedChats===chat?"white":"black"}
-              >
-                <Text>
-                  {(chat.users[1].email)}
-                </Text>
-              </Box>
-            ))
-          }
-
+              color={selectedChats === chat ? "white" : "black"}
+            >
+              <Text>{
+                !chat.isGroupChat?
+              chat.users[1].fullname:(chat.chatName)}</Text>
+            </Box>
+          ))}
         </Stack>
-
       </Box>
     </Box>
   );

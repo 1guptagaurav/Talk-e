@@ -11,8 +11,8 @@ import { verifyJWT } from "../middleware/user.middleware.js";
 
 const router = Router();
 
-router.route("/").post(verifyJWT, accessChat);
 router.route("/").get(verifyJWT, fetchChats);
+router.route("/").post(verifyJWT, accessChat);
 router.route("/group").post(verifyJWT, createGroupChat);
 router.route("/rename").put(verifyJWT, renameGroupName);
 router.route("/add").put(verifyJWT, addNewUser);

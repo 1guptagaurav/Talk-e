@@ -47,11 +47,10 @@ function SideBar() {
         },
         withCredentials: true,
       };
-
       await axios
         .post("http://localhost:8000/api/chat", { userId }, config)
-        .then((data) => setSelectedChats(data));
-      if (!chats.find((c) => c._id === data._id)) setChats([data, ...chats]);
+        .then((data) => {setSelectedChats(data);if (!chats.find((c) => c._id === data._id)) setChats([data, ...chats]);});
+      
       setLoadingChat(false);
       onClose();
     } catch (error) {
@@ -76,7 +75,7 @@ function SideBar() {
     localStorage.removeItem("user");
     navigate("/");
   };
-  const submitHandler = () => {
+  const submitHandler = async() => {
     if (!search) {
       toast({
         title: "Please Enter something in search",
@@ -93,7 +92,7 @@ function SideBar() {
     //     Authorization: `Bearer ${user}`,
     //   },
     // }
-    axios
+    await axios
       .get(`http://localhost:8000/api/user?search=${search}`, {
         withCredentials: true,
       })

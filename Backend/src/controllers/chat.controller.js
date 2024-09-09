@@ -15,7 +15,7 @@ export const accessChat = asyncHandler(async (req, res) => {
     isGroupChat: false,
     $and: [
       { users: { $elemMatch: { $eq: req.user._id } } },
-      { users: { $elemMatch: { $eq: req.userId } } },
+      { users: { $elemMatch: { $eq: userId._id } } },
     ],
   })
     .populate("users", "-password")
@@ -84,13 +84,13 @@ export const createGroupChat=asyncHandler(async(req,res)=>{
       isGroupChat: true,
       groupAdmin: req.user,
     });
-    const fullGroupChatName = await Chat.find({ id: groupChat._id })
+    const fullGroupChatName = await Chat.findOne({ _id: groupChat._id })
       .populate("users", "-password")
       .populate("groupAdmin","-password");
-      res.status(200).json(fullGroupChatName)
+      res.status(200).json(fullGroupChatName);
   } catch (error) {
     res.status(400)
-    throw new ApiError(400,error.message)
+    throw new ApiError(401,error.message)
   }
 })
 
