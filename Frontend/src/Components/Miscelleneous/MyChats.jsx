@@ -9,7 +9,8 @@ import GroupChatModal from "./GroupChatModal";
 
 function MyChats() {
   const [loggedUser, setLoggedUser] = useState();
-  const { user, selectedChats,setSelectedChats, chats, setChats } = useChat();
+  const { user, selectedChats, setSelectedChats, chats, setChats, fetchAgain } =
+    useChat();
   const toast = useToast();
 
   const fetchChats = async () => {
@@ -34,7 +35,7 @@ function MyChats() {
   useEffect(() => {
     setLoggedUser(JSON.parse(localStorage.getItem("user")));
     fetchChats();
-  }, []);
+  }, [fetchAgain]);
 
   return (
     <Box
