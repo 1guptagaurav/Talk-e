@@ -3,6 +3,7 @@ import useChat from "../../Context/ContextApi";
 import { Box, IconButton, Text } from "@chakra-ui/react";
 import { ArrowBackIcon } from "@chakra-ui/icons";
 import ProfileModal from "./ProfileModal";
+import UpateGroupChatModal from "./UpateGroupChatModal";
 
 function SingleChat() {
   const { fetchAgain, setFetchAgain, user, selectedChats, setSelectedChats } =useChat();
@@ -28,7 +29,7 @@ function SingleChat() {
             {selectedChats.isGroupChat ? (
               <>
               {(selectedChats.chatName.toUpperCase())}
-              {/* <UpateGroupChatModal /> */}
+              <UpateGroupChatModal />
               </>
             ) : (
               <>{
@@ -42,8 +43,8 @@ function SingleChat() {
           justifyContent={"flex-end"}
           p={3}
           bg={"#E8E8E8"}
-          w="600%"
-          h="900%"
+          w="100%"
+          h="100%"
           borderRadius={"lg"}
           overflowY={"hidden"}
           >
