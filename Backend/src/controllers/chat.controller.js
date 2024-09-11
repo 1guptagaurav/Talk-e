@@ -120,7 +120,7 @@ export const addNewUser=asyncHandler(async(req,res)=>{
   const addToGroup = await Chat.findByIdAndUpdate(
     chatId,
     {
-      $push: userId,
+      $push: { users: userId },
     },
     {
       new: true,
@@ -141,7 +141,7 @@ export const removeUser = asyncHandler(async (req, res) => {
   const removeFromGroup = await Chat.findByIdAndUpdate(
     chatId,
     {
-      $pull: userId,
+      $pull: { users: userId },
     },
     {
       new: true,
