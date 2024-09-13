@@ -22,7 +22,7 @@ import UserBadgeItems from "../UserAvatar/UserBadgeItems";
 import axios from "axios";
 import UserListitem from "../UserAvatar/UserListitem";
 
-function UpateGroupChatModal() {
+function UpateGroupChatModal({fetchMessages}) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { user, selectedChats, setSelectedChats, fetchAgain, setFetchAgain } =
     useChat();
@@ -90,6 +90,7 @@ function UpateGroupChatModal() {
     );
     userToRemove._id===user._id?setSelectedChats([]):setSelectedChats(data);
     setFetchAgain(!fetchAgain);
+    fetchMessages()
     setLoading(false);
   };
   const handleRename = async () => {
