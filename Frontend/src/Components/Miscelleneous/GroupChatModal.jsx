@@ -25,25 +25,47 @@ function GroupChatModal({ children }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [groupChatName, setGroupChatName] = useState();
   const [selectedUsers, setSelectedUsers] = useState([])
-  const [search, setSearch] = useState();
   const [SearchResult, setSearchResult] = useState([]);
   const [loading, setLoading] = useState(false);
   const { user, chats, setChats } = useChat();
+
+
+  let debounceTimeout;
+
   const handleSearch = async (e) => {
+    // Clear any existing debounce timeout
+    if (debounceTimeout) {
+      clearTimeout(debounceTimeout);
+    }
+
+    // If search input is empty, reset the state
     if (!e) {
-      setSearch();
       setSearchResult([]);
       return;
     }
-    setSearch(e);
-    setLoading(true);
-    await axios
-      .get(`http://localhost:8000/api/user?search=${e}`, {
-        withCredentials: true,
-      })
-      .then((response) => setSearchResult(response.data))
-      .finally(() => setLoading(false));
+
+    // Set a debounce timer for the search
+    debounceTimeout = setTimeout(async () => {
+      setLoading(true); 
+
+      try {
+        // Make the API call
+        const response = await axios.get(
+          `http://localhost:8000/api/user?search=${e}`,
+          {
+            withCredentials: true,
+          }
+        );
+        setSearchResult(response.data); // Set search results from the API response
+      } catch (error) {
+        console.error("Error fetching search results:", error);
+      } finally {
+        setLoading(false); // Hide loading spinner
+      }
+    }, 500); // 500ms debounce delay
   };
+
+
   const handleSubmit = async () => {
     if(!groupChatName || !selectedUsers){
       toast({

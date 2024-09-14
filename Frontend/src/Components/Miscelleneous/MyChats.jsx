@@ -9,8 +9,7 @@ import GroupChatModal from "./GroupChatModal";
 
 function MyChats() {
   const [loggedUser, setLoggedUser] = useState();
-  const { user, selectedChats, setSelectedChats, chats, setChats, fetchAgain } =
-    useChat();
+  const { user, selectedChats, setSelectedChats, chats, setChats, fetchAgain } = useChat();
   const toast = useToast();
 
   const fetchChats = async () => {
@@ -91,9 +90,9 @@ function MyChats() {
               key={chat._id}
               color={selectedChats === chat ? "white" : "black"}
             >
-              <Text>{
-                !chat.isGroupChat?
-              chat.users[1].fullname:(chat.chatName)}</Text>
+              <Text>
+                {!chat.isGroupChat ? chat.users[1].fullname : chat.chatName}
+              </Text>
             </Box>
           ))}
         </Stack>
