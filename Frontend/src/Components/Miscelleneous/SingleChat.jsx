@@ -1,41 +1,57 @@
 import React, { useEffect, useState } from "react";
 import useChat from "../../Context/ContextApi";
-import { Box, FormControl, IconButton, Input, Spinner, Text, useToast } from "@chakra-ui/react";
+import {
+  Box,
+  FormControl,
+  IconButton,
+  Input,
+  Spinner,
+  Text,
+  useToast,
+} from "@chakra-ui/react";
 import { ArrowBackIcon } from "@chakra-ui/icons";
 import ProfileModal from "./ProfileModal";
 import UpateGroupChatModal from "./UpateGroupChatModal";
 import axios from "axios";
-import "./styles.css"
+import "./styles.css";
 import ScrollableChats from "./ScrollableChats";
+import io from "socket.io-client";
 
+const ENDPOINT = "http://localhost:8000";
+var socket, selectedChatCompare;
 function SingleChat() {
-  const { fetchAgain, setFetchAgain, user, selectedChats, setSelectedChats } =useChat();
-  const [messages, setMessages] = useState([])
-  const [loading ,setLoading]= useState(false)
+  const { fetchAgain, setFetchAgain, user, selectedChats, setSelectedChats } =
+    useChat();
+  const [messages, setMessages] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [newMessage, setNewMessage] = useState("");
-  const toast=useToast()
-  const fetchMessages=async (e)=>{
-    if(!selectedChats) return;
+  const [socketConnected, setSocketConnected] = useState(false);
+  const toast = useToast();
+  const fetchMessages = async (e) => {
+    if (!selectedChats) return;
     try {
-        const config = {
-          withCredentials: true,
-        };
-        const {data}=await axios.get(`http://localhost:8000/api/message/${selectedChats._id}`,config)
-        setMessages(data)
-        console.log(data);
-      } catch (error) {
-        toast({
+      const config = {
+        withCredentials: true,
+      };
+      const { data } = await axios.get(
+        `http://localhost:8000/api/message/${selectedChats._id}`,
+        config
+      );
+      setMessages(data);
+      socket.emit("user chat", selectedChats._id);
+    } catch (error) {
+      toast({
         title: "unable to fetch chat",
         status: "warning",
         duration: "4000",
         isClosable: true,
         position: "top-left",
       });
-  }
-}
+    }
+  };
 
-  const sendMessage=async (e)=>{
-    if(e.key==="Enter" && newMessage){
+  const sendMessage = async (e) => {
+    if (e.key === "Enter" && newMessage) {
       try {
         const config = {
           headers: {
@@ -43,30 +59,41 @@ function SingleChat() {
           },
           withCredentials: true,
         };
-        setNewMessage("")
-        const {data}=await axios.post("http://localhost:8000/api/message", { 
-          messageToSend:newMessage,
-          chatId:selectedChats._id
-         },config)
-         setMessages([...messages,data])
-         
+        setNewMessage("");
+        const { data } = await axios.post(
+          "http://localhost:8000/api/message",
+          {
+            messageToSend: newMessage,
+            chatId: selectedChats._id,
+          },
+          config
+        );
+        setMessages([...messages, data]);
       } catch (error) {
         toast({
-        title: "unable to fetch chat",
-        status: "warning",
-        duration: "4000",
-        isClosable: true,
-        position: "top-left",
-      });
+          title: "unable to fetch chat",
+          status: "warning",
+          duration: "4000",
+          isClosable: true,
+          position: "top-left",
+        });
       }
     }
-  }
-  const typingHandler = (e) => {
-    setNewMessage(e.target.value)
   };
-  useEffect(()=>{
-    fetchMessages()
-  },[selectedChats])
+  useEffect(() => {
+    socket = io(ENDPOINT);
+    socket.emit("setup", user);
+    socket.on("connection", () => {
+      setSocketConnected(true);
+    });
+  }, []);
+
+  const typingHandler = (e) => {
+    setNewMessage(e.target.value);
+  };
+  useEffect(() => {
+    fetchMessages();
+  }, [selectedChats]);
   return (
     <div>
       {selectedChats ? (
