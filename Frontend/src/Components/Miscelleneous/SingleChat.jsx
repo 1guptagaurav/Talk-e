@@ -16,9 +16,9 @@ import axios from "axios";
 import "./styles.css";
 import ScrollableChats from "./ScrollableChats";
 import io from "socket.io-client";
+import { socket } from "../../socket/socket";
 
 const ENDPOINT = "http://localhost:8000";
-var socket, selectedChatCompare;
 function SingleChat() {
   const { fetchAgain, setFetchAgain, user, selectedChats, setSelectedChats } =
     useChat();
@@ -27,6 +27,7 @@ function SingleChat() {
   const [newMessage, setNewMessage] = useState("");
   const [socketConnected, setSocketConnected] = useState(false);
   const toast = useToast();
+  console.log("selectedcha", selectedChats);
   const fetchMessages = async (e) => {
     if (!selectedChats) return;
     try {
@@ -38,7 +39,8 @@ function SingleChat() {
         config
       );
       setMessages(data);
-      socket.emit("user chat", selectedChats._id);
+      // socket.emit("user chat", selectedChats._id);
+      
     } catch (error) {
       toast({
         title: "unable to fetch chat",
@@ -49,7 +51,28 @@ function SingleChat() {
       });
     }
   };
-
+  // useEffect(() => {
+  //   socket = io(ENDPOINT);
+  //   socket.emit("setup", user);
+  //   socket.on("connected", () => {
+  //     setSocketConnected(true);
+  //   });
+  // },[]);
+  useEffect(() => {
+    fetchMessages();
+    // selectedChatCompare = selectedChats;
+  }, [selectedChats]);
+  // useEffect(() => {
+  //   socket.on("message recieved", (newMessageRecieved) => {
+  //     if (
+  //       !selectedChatCompare ||
+  //       selectedChatCompare._id !== newMessageRecieved.chat._id
+  //     ) {
+  //     } else {
+  //       setMessages([...messages, newMessageRecieved]);
+  //     }
+  //   });
+  // });
   const sendMessage = async (e) => {
     if (e.key === "Enter" && newMessage) {
       try {
@@ -68,8 +91,24 @@ function SingleChat() {
           },
           config
         );
+        // socket.emit("new message", data);
         setMessages([...messages, data]);
+
+        console.log(
+          "sending message to another user",
+          user._id,
+          selectedChats.users,
+          data
+        );
+
+        socket.emit("send message", {
+          userId: user._id,
+          senders: selectedChats.users,
+          payload: data,
+        });
+
       } catch (error) {
+        console.log('error while sending message',error);
         toast({
           title: "unable to fetch chat",
           status: "warning",
@@ -80,20 +119,10 @@ function SingleChat() {
       }
     }
   };
-  useEffect(() => {
-    socket = io(ENDPOINT);
-    socket.emit("setup", user);
-    socket.on("connection", () => {
-      setSocketConnected(true);
-    });
-  }, []);
 
   const typingHandler = (e) => {
     setNewMessage(e.target.value);
   };
-  useEffect(() => {
-    fetchMessages();
-  }, [selectedChats]);
   return (
     <div>
       {selectedChats ? (
