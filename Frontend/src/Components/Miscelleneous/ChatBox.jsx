@@ -7,17 +7,18 @@ function ChatBox() {
 
   const { selectedChats } = useChat();
   return (
-    <Box 
-    display={{base:selectedChats?"flex":"none",md:"flex"}}
-
-    flexDir={"column"}
-    p={3}
-    bg={"white"}
-    w={{base:"100%",md:"68%"}}
-    borderRadius={"lg"}
-    borderWidth={"1px"}
-    > 
-        <SingleChat/>
+    <Box
+      display={{ base: selectedChats ? "flex" : "none", md: "flex" }}
+      // alignItems="center"
+      flexDir={"column"}
+      p={3}
+      bg={"white"}
+      w={{ base: "100%", md: "68%" }}
+      borderRadius={"lg"}
+      borderWidth={"1px"}
+      h={'full'}
+    >
+      <SingleChat />
     </Box>
   );
 }

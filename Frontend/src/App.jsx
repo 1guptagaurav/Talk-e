@@ -5,6 +5,7 @@ import { Route,Routes, useNavigate } from "react-router-dom";
 import { HomePage } from "./Pages/Homepage.jsx";
 import { ChatProvider } from "./Context/ContextApi.jsx";
 import {ChatPage} from "./Pages/ChatPage.jsx";
+import { extendTheme, ChakraProvider } from "@chakra-ui/react";
 function App() {
   
   return (

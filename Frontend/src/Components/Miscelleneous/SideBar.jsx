@@ -34,9 +34,18 @@ function SideBar() {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { user, setSelectedChats, chats, setChats } = useChat();
   const navigate = useNavigate();
-  // useEffect(() => {
-  //   if (!user) navigate("/");
-  // }, [navigate]);
+  useEffect(() => {
+    const getCookie = (name) => {
+      const value = `; ${document.cookie}`;
+      const parts = value.split(`; ${name}=`);
+      if (parts.length === 2) return parts.pop().split(";").shift();
+      return null;
+    };
+    const accessToken = getCookie("accessToken");
+    if (accessToken == null) {
+      localStorage.removeItem("user");
+    }
+  }, []);
 
   const accessChat = async (userId) => {
     try {
@@ -49,8 +58,12 @@ function SideBar() {
       };
       await axios
         .post("http://localhost:8000/api/chat", { userId }, config)
-        .then((data) => {setSelectedChats(data);if (!chats.find((c) => c._id === data._id)) setChats([data, ...chats]);});
-      
+        .then((data) => {
+          setSelectedChats(data.data);
+          if (!chats.find((c) => c._id === data.data._id)) {
+            setChats([data.data, ...chats]);
+          }
+        });
       setLoadingChat(false);
       onClose();
     } catch (error) {
@@ -75,7 +88,7 @@ function SideBar() {
     localStorage.removeItem("user");
     navigate("/");
   };
-  const submitHandler = async() => {
+  const submitHandler = async () => {
     if (!search) {
       toast({
         title: "Please Enter something in search",
@@ -107,6 +120,7 @@ function SideBar() {
         alignItems={"center"}
         bg="white"
         w="100%"
+        h="10vh"
         p="5px 10px 5px 10px"
         borderWidth="5px"
       >
@@ -118,7 +132,10 @@ function SideBar() {
             </Text>
           </Button>
         </Tooltip>
-        <Text fontSize="2xl" fontFamily="Work sans">
+        <Text
+          fontSize={{ base: "10px", smm: "20", sm: "30px", lg: "40" }}
+          fontFamily="Work sans"
+        >
           Walk-e-Talk-e
         </Text>
         <div>

@@ -4,9 +4,10 @@ import { User } from "../models/user.models.js";
 import { ApiError } from "../utils/ApiError.js";
 import { asyncHandler } from "../utils/AsyncHandler.js";
 
+
+
 export const sendMessage=asyncHandler(async(req,res)=>{
     const {messageToSend,chatId}=req.body
-
     if(!messageToSend || !chatId){
         throw new ApiError(401,"Something went wrong")
         return;

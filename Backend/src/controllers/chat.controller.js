@@ -8,44 +8,51 @@ import { User } from "../models/user.models.js";
 export const accessChat = asyncHandler(async (req, res) => {
   const { userId } = req.body;
 
-  if(!userId){
-    return res.sendStatus(400)
+  if (!userId) {
+    return res.sendStatus(400); // Bad Request
   }
-  var isChat = await Chat.find({
-    isGroupChat: false,
-    $and: [
-      { users: { $elemMatch: { $eq: req.user._id } } },
-      { users: { $elemMatch: { $eq: userId._id } } },
-    ],
-  })
-    .populate("users", "-password")
-    .populate("latestMessage");
 
-  isChat = await User.populate(isChat, {
-    path: "latestMessage.sender",
-    select: "fullname pic email",
-  });
+  // Ensure the `users` array is sorted for consistency
+  const sortedUsers = [req.user._id, userId].sort();
 
-  if(isChat>0){
-    res.send(isChat[0]);
-  }else{
-    var chatData={
-      chatName:'sender',
-      isGroupChat:false,
-      users:[req.user._id,userId]
+  try {
+    // Check if a chat already exists
+    let isChat = await Chat.findOne({
+      isGroupChat: false,
+      users: sortedUsers,
+    })
+      .populate("users", "-password")
+      .populate("latestMessage");
+
+    isChat = await User.populate(isChat, {
+      path: "latestMessage.sender",
+      select: "fullname pic email",
+    });
+
+    if (isChat) {
+      res.status(200).send(isChat);
+    } else {
+      // Create a new chat if none exists
+      const chatData = {
+        chatName: "sender",
+        isGroupChat: false,
+        users: sortedUsers,
+      };
+
+      const createdChat = await Chat.create(chatData);
+
+      const fullChat = await Chat.findOne({ _id: createdChat._id })
+        .populate("users", "-password")
+        .lean();
+
+      res.status(200).send(fullChat);
     }
-  }
-  try{
-    const createdChat= await Chat.create(chatData)
-    const fullChat=await Chat.findOne({id:createdChat._id}).populate(
-      "users","-password"
-    ).lean()
-    res.status(200).send(fullChat)
-  }catch{
-    res.status(400)
+  } catch (error) {
+    res.status(400);
     throw new Error(error.message);
   }
 });
+
 
 
 export const fetchChats=asyncHandler(async(req,res)=>{
@@ -76,7 +83,6 @@ export const createGroupChat=asyncHandler(async(req,res)=>{
     return res.status(401).send("more Users Required")
   }
   users.push(req.user);
-
   try {
     const groupChat = await Chat.create({
       chatName: req.body.name,

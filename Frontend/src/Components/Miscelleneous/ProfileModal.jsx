@@ -1,10 +1,27 @@
-import { ViewIcon } from '@chakra-ui/icons'
-import { Button, IconButton, Image, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, useDisclosure } from '@chakra-ui/react'
-import React from 'react'
+import { ViewIcon } from "@chakra-ui/icons";
+import {
+  Button,
+  IconButton,
+  Image,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
+  useDisclosure,
+  Flex,
+  Text,
+} from "@chakra-ui/react";
+import React, { useEffect } from "react";
 
-function ProfileModal({user, children}) {
+function ProfileModal({ user, children }) {
+  if(undefined==user) user = JSON.parse(localStorage.getItem("user"));
 
-const {isOpen, onOpen, onClose}=useDisclosure()
+
+  const { isOpen, onOpen, onClose } = useDisclosure();
+
   return (
     <>
       {children ? (
@@ -24,22 +41,30 @@ const {isOpen, onOpen, onClose}=useDisclosure()
             fontFamily={"Work sans"}
             display={"flex"}
             justifyContent={"center"}
-          ></ModalHeader>
+          >
+            Profile Details
+          </ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            <Image
-            borderRadius={"full"}
-            boxSize={"150px"}
-            // src={user.pic}
-            // alt={user.email}
-            />
+            <Flex align="center" gap="4">
+              <Image
+                borderRadius={"full"}
+                boxSize={"150px"}
+                src={user.pic}
+                alt={user.email}
+              />
+              <Text fontSize="5xl" fontWeight="bold">
+                {user.fullname}
+              </Text>
+            </Flex>
+            <Text >
+              {user.email}
+            </Text>
           </ModalBody>
-
           <ModalFooter>
             <Button colorScheme="blue" mr={3} onClick={onClose}>
               Close
             </Button>
-            <Button variant="ghost">Secondary Action</Button>
           </ModalFooter>
         </ModalContent>
       </Modal>
@@ -47,4 +72,4 @@ const {isOpen, onOpen, onClose}=useDisclosure()
   );
 }
 
-export default ProfileModal
+export default ProfileModal;

@@ -4,8 +4,17 @@ import cors from "cors"
 import userRouter  from "./routes/user.routes.js"
 import chatRouter from "./routes/chat.routes.js"
 import messageRouter from "./routes/message.routes.js";
-const app=express()
+import { createServer } from "http";
+// import { Server } from "socket.io";
 
+const app=express()
+const server = createServer(app);
+// const io = new Server(server,{
+//   cors:{
+//     origin:"http://localhost:5173",
+//     credentials:true
+//   }
+// });
 app.use(
   cors({
     origin: "http://localhost:5173",
@@ -22,5 +31,20 @@ app.use("/api/user", userRouter);
 app.use("/api/chat", chatRouter);
 app.use("/api/message", messageRouter);
 
+// io.on("connection", (socket) => {
+//   console.log(`connected ${socket.id}`);
+//   socket.emit("hello", socket.id);
+//   socket.on("join-room",(room)=>{
+//     console.log(room)
+//     socket.join(room)
+//   })
+//   socket.on("message",({room,data})=>{
+//     console.log(`app line 41 ${data.content}`)
+//     socket.to(room).emit("recieve-message",data)
+//   })
+//   socket.on("disconnect", () => {
+//     console.log(`disconnected ${socket.id}`);
+//   });
+// });
 
 export {app}

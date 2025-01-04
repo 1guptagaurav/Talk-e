@@ -16,7 +16,6 @@ import useChat from '../Context/ContextApi.jsx';
 function HomePage() {
   const navigate = useNavigate();
     const savedUser = useChat()
-    console.log(savedUser);
   // useEffect(() => {
   //   if (savedUser) navigate("/chats");
   // }, [navigate]);
@@ -33,7 +32,7 @@ function HomePage() {
         borderWidth="1px"
         textAlign="center"
       >
-        <Text fontSize="4xl">Talk-e</Text>
+        <Text fontSize="4xl">Walk-e-Talk-e</Text>
       </Box>
       <Box bg="white" w="100%" p={4} borderRadius="lg" borderWidth="1px">
         <Tabs variant="soft-rounded" colorScheme="green">

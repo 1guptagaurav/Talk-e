@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import useChat from "../../Context/ContextApi";
 import { Box, Button, Stack, Text, useToast } from "@chakra-ui/react";
 import axios from "axios";
@@ -6,12 +6,14 @@ import { json } from "react-router-dom";
 import { AddIcon } from "@chakra-ui/icons";
 import { Chat } from "../../../../Backend/src/models/chat.model";
 import GroupChatModal from "./GroupChatModal";
+import { useNavigate } from "react-router-dom";
+
 
 function MyChats() {
   const [loggedUser, setLoggedUser] = useState();
   const { user, selectedChats, setSelectedChats, chats, setChats, fetchAgain } = useChat();
   const toast = useToast();
-
+  const navigate = useNavigate(); 
   const fetchChats = async () => {
     try {
       const config = {
@@ -36,6 +38,7 @@ function MyChats() {
     fetchChats();
   }, [fetchAgain]);
 
+  
   return (
     <Box
       display={{ base: selectedChats ? "none" : "flex", md: "flex" }}
@@ -91,7 +94,7 @@ function MyChats() {
               color={selectedChats === chat ? "white" : "black"}
             >
               <Text>
-                {!chat.isGroupChat ? chat.users[1].fullname : chat.chatName}
+                {!chat.isGroupChat ? chat.users[0].fullname===user.fullname?chat.users[1].fullname:chat.users[0].fullname : chat.chatName}
               </Text>
             </Box>
           ))}
