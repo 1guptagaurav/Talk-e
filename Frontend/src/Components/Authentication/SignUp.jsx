@@ -11,6 +11,8 @@ import {
 import React from "react";
 import { useState } from "react";
 import axios from "axios";
+import useChat from "../../Context/ContextApi";
+import { useNavigate } from "react-router-dom";
 
 function SignUp() {
   const [fullname, setFullName] = useState();
@@ -21,7 +23,9 @@ function SignUp() {
   const [show, setShow] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const {setUser}=useChat()
   const toast = useToast();
+  const navigate=useNavigate()
   const postDetails = (pic) => {
     if (pic === undefined) {
       toast({
@@ -85,6 +89,21 @@ function SignUp() {
         });
         console.log(error.message)
       });
+      if(res){
+        const response = await axios.post(
+          "http://localhost:8000/api/user/login",
+          {
+            email,
+            password,
+          }
+        );
+        const { user, accessToken, refreshToken } = response.data.data;
+        localStorage.setItem("user", JSON.stringify(user));
+        setUser(user);
+        document.cookie = `accessToken=${accessToken}; path=/;`;
+        document.cookie = `refreshToken=${refreshToken}; path=/;`;
+        navigate("/chats");
+    }
     } 
     catch (error) {
       console.error("Unexpected error:", error);

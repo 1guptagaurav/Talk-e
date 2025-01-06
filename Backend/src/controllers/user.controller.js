@@ -15,7 +15,6 @@ const generateAccessAndRefreshToken = async (id) => {
 
 const registerUser = asyncHandler(async (req, res) => {
   const { fullname, email, password } = req.body;
-  console.log("i am here")
   if (
     [fullname, email, password].some((field) => !field || field?.trim() === "")
   ) {
@@ -31,7 +30,6 @@ const registerUser = asyncHandler(async (req, res) => {
   if (picLocalPath) {
     pic = await uploadOnCloudinary(picLocalPath);
   }
-  // console.log(picLocalPath);
   const user = await User.create({
     fullname,
     email,
@@ -40,12 +38,9 @@ const registerUser = asyncHandler(async (req, res) => {
   });
 
   const createduser = await User.findById(user._id).select("-password -refreshToken");
-
-  console.log('createdUser',createduser);
   if (!createduser) {
     throw new ApiError(500, "Cannnot Register User");
   }
-  // console.log("User:-", createduser);
   return res
     .status(201)
     .json(new ApiResponse(201, "User Successfully Registered"));
@@ -56,7 +51,6 @@ const loginUser = asyncHandler(async (req, res) => {
   if ([email, password].some((field) => field?.trim() === "")) {
     throw new ApiError(400, "Please fill all the fields");
   }
-  console.log(email)
   const user = await User.findOne( {email} );
   if (!user) {
     throw new ApiError(400, "User not registered");

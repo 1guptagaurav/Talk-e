@@ -1,4 +1,4 @@
-import React, { useEffect, useState,useMemo } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import useChat from "../../Context/ContextApi";
 import {
   Box,
@@ -15,7 +15,7 @@ import axios from "axios";
 import "./styles.css";
 import ScrollableChats from "./ScrollableChats";
 import { useNavigate } from "react-router-dom";
-// import { io } from "socket.io-client";
+import { io } from "socket.io-client";
 
 function SingleChat() {
   const { fetchAgain, setFetchAgain, user, selectedChats, setSelectedChats } =
@@ -23,15 +23,21 @@ function SingleChat() {
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [newMessage, setNewMessage] = useState("");
-  // const [room,setRoom]=useState([]);
-  const navigate=useNavigate()
+  const navigate = useNavigate();
   const toast = useToast();
-  const fetchMessages = async (e) => {
-    if (!selectedChats || !selectedChats._id) return;
+
+  // Initialize socket
+  const socket = useMemo(
+    () => io("http://localhost:8000", { withCredentials: true }),
+    []
+  );
+
+  // Fetch messages for the selected chat
+  const fetchMessages = async () => {
+    if (!selectedChats?._id) return;
+
     try {
-      const config = {
-        withCredentials: true,
-      };
+      const config = { withCredentials: true };
       const { data } = await axios.get(
         `http://localhost:8000/api/message/${selectedChats._id}`,
         config
@@ -39,69 +45,74 @@ function SingleChat() {
       setMessages(data);
     } catch (error) {
       toast({
-        title: "unable to fetch chat",
+        title: "Unable to fetch chat",
         status: "warning",
-        duration: "4000",
+        duration: 4000,
         isClosable: true,
         position: "top-left",
       });
     }
   };
+
+  // Join the selected chat room
   useEffect(() => {
-    fetchMessages();
-    // selectedChatCompare = selectedChats;
-  }, [selectedChats]);
-  // const socket = useMemo(
-  //   () =>
-  //     io("http://localhost:8000", {
-  //       withCredentials: true,
-  //     }),
-  //   []
-  // );
-// useEffect(() => {
-//   // console.log(room);
-//   socket.on("connect", () => {
-//     console.log(`connected`);
-//   });
-//   socket.on("hello", (e) => {
-//     console.log(e);
-//   });
-  
-//   return () => {
-//     socket.disconnect();
-//   };
-// }, []);
-const sendMessage = async (e) => {
-  if (e.key === "Enter" && newMessage) {
-    try {
-      const config = {
-        headers: {
-            "content-type": "application/json",
-          },
+    if (selectedChats?._id) {
+      const room = selectedChats._id;
+      socket.emit("join-room", room);
+      console.log(`Joined room: ${room}`);
+      fetchMessages();
+    }
+
+    return () => {
+      if (selectedChats?._id) {
+        const room = selectedChats._id;
+        socket.emit("leave-room", room);
+        console.log(`Left room: ${room}`);
+      }
+    };
+  }, [selectedChats, socket]);
+
+  // Handle incoming messages via socket
+  useEffect(() => {
+    const handleNewMessage = (data) => {
+      setMessages((prev) => [...prev, data]);
+    };
+
+    socket.on("recieve-message", handleNewMessage);
+
+    return () => {
+      socket.off("recieve-message", handleNewMessage);
+    };
+  }, [socket]);
+
+  // Handle sending a message
+  const sendMessage = async (e) => {
+    if (e.key === "Enter" && newMessage.trim() && selectedChats?._id) {
+      try {
+        const config = {
+          headers: { "content-type": "application/json" },
           withCredentials: true,
         };
+        const messageContent = {
+          messageToSend: newMessage,
+          chatId: selectedChats._id,
+        };
         setNewMessage("");
-        // console.log(`message send ${newMessage}`)
         const { data } = await axios.post(
           "http://localhost:8000/api/message",
-          {
-            messageToSend: newMessage,
-            chatId: selectedChats._id,
-          },
+          messageContent,
           config
         );
-        // socket.emit("join-room", room);
-        // socket.emit("message", { room, data });
-        // socket.on("recieve-message", (data) => {
-        //   console.log("i am inside recieve messages");
-        //   setMessages([...messages, data]);
-        // });
-        setMessages([...messages, data]);
+
+        const room = selectedChats._id;
+        socket.emit("message", { room, data });
+        setMessages((prev) => [...prev, data]);
       } catch (error) {
+        console.error(error);
         toast({
-          title: "unable to send message",
+          title: "Unable to send message",
           status: "warning",
-          duration: "4000",
+          duration: 4000,
           isClosable: true,
           position: "top-left",
         });
@@ -109,9 +120,10 @@ const sendMessage = async (e) => {
     }
   };
 
-  const typingHandler = (e) => {
-    setNewMessage(e.target.value);
-  };
+  // Input change handler
+  const handleInputChange = (e) => setNewMessage(e.target.value);
+
+  // Render chat UI
   return (
     <div>
       {selectedChats ? (
@@ -123,56 +135,51 @@ const sendMessage = async (e) => {
             w={"100%"}
             fontFamily="Work sans"
             display="flex"
-            justifyContent={{ base: "space-between" }}
-            alignItems={"center"}
+            justifyContent="space-between"
+            alignItems="center"
           >
             <IconButton
               display={{ base: "flex", md: "none" }}
               icon={<ArrowBackIcon />}
-              onClick={() => setSelectedChats()}
+              onClick={() => setSelectedChats(null)}
             />
             {selectedChats.isGroupChat ? (
               <>
                 {selectedChats.chatName.toUpperCase()}
-                <UpateGroupChatModal fetchMessages={fetchMessages} />
+                <UpdateGroupChatModal fetchMessages={fetchMessages} />
               </>
             ) : (
               <>
-                <Text as="span" fontSize={{ base: "10px", smm: "30px" }}>
-                  {selectedChats.users[0] === user._id
-                    ? selectedChats.users[1].fullname
-                    : selectedChats.users[0].fullname}
-                </Text>
-                {<ProfileModal />}
+                {selectedChats.users.find((u) => u.fullname !== user.fullname)
+                  ?.fullname || "Unknown User"}
+                <ProfileModal />
               </>
             )}
           </Text>
           <Box
-            display={"flex"}
-            flexDir={"column"}
-            justifyContent={"space-between"}
+            display="flex"
+            flexDir="column"
+            justifyContent="space-between"
             p={3}
-            bg={"#E8E8E8"}
+            bg="#E8E8E8"
             w="100%"
             h="70vh"
-            borderRadius={"lg"}
-            overflow={"hidden"}
+            borderRadius="lg"
+            overflow="hidden"
           >
             <div className="messages">
               <ScrollableChats messages={messages} />
             </div>
           </Box>
-          <div>
-            <FormControl onKeyDown={sendMessage} isRequired mt={3}>
-              <Input
-                variant={"filled"}
-                bg={"#E0E0E0"}
-                placeholder="Enter a message..."
-                onChange={typingHandler}
-                value={newMessage}
-              />
-            </FormControl>
-          </div>
+          <FormControl onKeyDown={sendMessage} isRequired mt={3}>
+            <Input
+              variant="filled"
+              bg="#E0E0E0"
+              placeholder="Enter a message..."
+              onChange={handleInputChange}
+              value={newMessage}
+            />
+          </FormControl>
         </div>
       ) : (
         <Box
@@ -181,7 +188,7 @@ const sendMessage = async (e) => {
           justifyContent="center"
           h="100%"
         >
-          <Text fontSize={"3xl"} pb={3} fontFamily="Work sans">
+          <Text fontSize="3xl" pb={3} fontFamily="Work sans">
             Click on a user to start chatting
           </Text>
         </Box>
