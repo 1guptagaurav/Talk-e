@@ -57,16 +57,6 @@ function SignUp() {
         });
         return;
       }
-      if (!email) {
-        toast({
-          title: "Email Required",
-          status: "warning",
-          duration: "4000",
-          isClosable: true,
-          position: "top",
-        });
-        return;
-      }
       if(!otpSent){
         toast({
           title: "Please Click on Send OTP Button",
@@ -147,14 +137,24 @@ function SignUp() {
     } 
   };
   const sendOTP=async ()=>{
-    setOTPSent(!otpSent)
+    if (!email) {
+      toast({
+        title: "Email Required",
+        status: "warning",
+        duration: "4000",
+        isClosable: true,
+        position: "top",
+      });
+      return;
+    }
+    setOTPSent(true)
     const randOTP=Math.floor(Math.random() * (999999 - 100000 + 1)) + 100000;
     setOTP(randOTP)
     axios.post("http://localhost:8000/api/mail",{email,randOTP});
   }
   const verifyOTP = () => {
     if(parseInt(userOTP)===otp){
-      setverify(!verify)
+      setverify(true)
       return;
     }else{
       toast({
