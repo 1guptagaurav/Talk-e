@@ -122,8 +122,7 @@ function SignUp() {
         window.location.reload();
       }).catch((error)=>{
           toast({
-              title: "Something went wrong",
-              description: error.message,
+              title: "User Already Registered",
               status: "warning",
               duration: "4000",
           isClosable: true,
@@ -147,12 +146,15 @@ function SignUp() {
       });
       return;
     }
-    setOTPSent(true)
     const randOTP=Math.floor(Math.random() * (999999 - 100000 + 1)) + 100000;
     setOTP(randOTP)
-    axios.post("http://localhost:8000/api/mail",{email,randOTP});
+    if (!otpSent) {
+      axios.post("http://localhost:8000/api/mail", { email, randOTP });
+    }
+    setOTPSent(true)
   }
   const verifyOTP = () => {
+    console.log(otp)
     if(parseInt(userOTP)===otp){
       setverify(true)
       return;

@@ -16,8 +16,8 @@ export const sendOtpEmail = async (req) => {
     // Email content
     const { randOTP, email } = req.body;
     const info = await transporter.sendMail({
-      from: `"Walk-e-Talk-e Team" <${process.env.MAIL_USERID}>`, // sender address
-      to: email, // recipient email
+      from: `"Walk-e-Talk-e Team">`, 
+      to: email, 
       subject: "Your Walk-e-Talk-e OTP Code is Here!", // Subject line
       text: `Hi there,
 
