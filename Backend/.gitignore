@@ -1,5 +1,3 @@
-../controllers/nodemailer.controller.js
-
 # Logs
 logs
 *.log
