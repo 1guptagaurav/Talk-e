@@ -4,9 +4,10 @@ import cors from "cors"
 import userRouter  from "./routes/user.routes.js"
 import chatRouter from "./routes/chat.routes.js"
 import messageRouter from "./routes/message.routes.js";
+import mailRouter from "./routes/mail.routes.js"
 import { createServer } from "http";
 import { Server } from "socket.io";
-
+// import { main } from "./controllers/nodemailer.controller.js"
 const app=express()
 const server = createServer(app);
 const io = new Server(server,{
@@ -30,7 +31,7 @@ app.use(cookieParser())
 app.use("/api/user", userRouter);
 app.use("/api/chat", chatRouter);
 app.use("/api/message", messageRouter);
-
+app.use("/api/mail",mailRouter)
 io.on("connection", (socket) => {
   console.log(`Socket connected: ${socket.id}`);
 

@@ -8,7 +8,7 @@ import {
   Button,
   useToast,
 } from "@chakra-ui/react";
-import React from "react";
+import React, { useMemo } from "react";
 import { useState } from "react";
 import axios from "axios";
 import useChat from "../../Context/ContextApi";
@@ -21,6 +21,11 @@ function SignUp() {
   const [confirmPassword, setConfirmPassword] = useState();
   const [pic, setPic] = useState();
   const [show, setShow] = useState(false);
+  const [verify, setverify] = useState(false);
+  const [sent, setsent] = useState(false);
+  const [otp,setOTP]=useState();
+  const [userOTP,setUserOTP]=useState(null)
+  const [otpSent,setOTPSent]=useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const {setUser}=useChat()
@@ -42,6 +47,56 @@ function SignUp() {
   
   const submitHandler = async () => {
     try {
+      if(!fullname){
+        toast({
+          title: "Name Required",
+          status: "warning",
+          duration: "4000",
+          isClosable: true,
+          position: "top",
+        });
+        return;
+      }
+      if (!email) {
+        toast({
+          title: "Email Required",
+          status: "warning",
+          duration: "4000",
+          isClosable: true,
+          position: "top",
+        });
+        return;
+      }
+      if(!otpSent){
+        toast({
+          title: "Please Click on Send OTP Button",
+          status: "warning",
+          duration: "4000",
+          isClosable: true,
+          position: "top",
+        });
+        return;
+      }
+      if(!verify){
+        toast({
+          title: "Please Verify OTP",
+          status: "warning",
+          duration: "4000",
+          isClosable: true,
+          position: "top",
+        });
+        return;
+      }
+      if (!password) {
+        toast({
+          title: "Password Required",
+          status: "warning",
+          duration: "4000",
+          isClosable: true,
+          position: "top",
+        });
+        return;
+      }
       if (password !== confirmPassword) {
         toast({
           title: "Password and Confirm Password are different",
@@ -57,10 +112,6 @@ function SignUp() {
           "content-type": "multipart/form-data",
         },
       };
-
-
-      // Call the function when the component mounts
-      
       const res = await axios.post(
         "http://localhost:8000/api/user/register",
         {
@@ -72,12 +123,13 @@ function SignUp() {
         config
       ).then((response)=>{
         toast({
-          title: "Something went right",
+          title: "Registered Sucessfully",
           status: "success",
           duration: "4000",
           isClosable: true,
           position: "top",
         });
+        window.location.reload();
       }).catch((error)=>{
           toast({
               title: "Something went wrong",
@@ -89,27 +141,32 @@ function SignUp() {
         });
         console.log(error.message)
       });
-      if(res){
-        const response = await axios.post(
-          "http://localhost:8000/api/user/login",
-          {
-            email,
-            password,
-          }
-        );
-        const { user, accessToken, refreshToken } = response.data.data;
-        localStorage.setItem("user", JSON.stringify(user));
-        setUser(user);
-        document.cookie = `accessToken=${accessToken}; path=/;`;
-        document.cookie = `refreshToken=${refreshToken}; path=/;`;
-        navigate("/chats");
-    }
     } 
     catch (error) {
       console.error("Unexpected error:", error);
     } 
   };
-
+  const sendOTP=async ()=>{
+    setOTPSent(!otpSent)
+    const randOTP=Math.floor(Math.random() * (999999 - 100000 + 1)) + 100000;
+    setOTP(randOTP)
+    axios.post("http://localhost:8000/api/mail",{email,randOTP});
+  }
+  const verifyOTP = () => {
+    if(parseInt(userOTP)===otp){
+      setverify(!verify)
+      return;
+    }else{
+      toast({
+        title: "Wrong OTP",
+        status: "warning",
+        duration: "4000",
+        isClosable: true,
+        position: "top",
+      });
+    }
+    console.log("Clicked on verified OTP");
+  };
   return (
     <div>
       <VStack spacing="5px">
@@ -122,10 +179,28 @@ function SignUp() {
         </FormControl>
         <FormControl id="email" isRequired>
           <FormLabel>Email</FormLabel>
-          <Input
-            placeholder="Enter your Email Id"
-            onChange={(e) => setemail(e.target.value)}
-          />
+          <InputGroup>
+            <Input
+              placeholder="Enter your Email Id"
+              onChange={(e) => setemail(e.target.value)}
+            />
+            <InputRightElement width="6.5rem">
+              <Button h="1.75rem" size="sm" onClick={() => sendOTP()}>
+                {!otpSent? "Send OTP" : "OTP Send"}
+              </Button>
+            </InputRightElement>
+          </InputGroup>
+        </FormControl>
+        <FormControl id="otp" isRequired>
+          <FormLabel>OTP</FormLabel>
+          <InputGroup>
+            <Input placeholder="Enter OTP" onChange={(e) => setUserOTP(e.target.value)} />
+            <InputRightElement width="4.5rem">
+              <Button h="1.75rem" size="sm" onClick={() => verifyOTP()}>
+                {!verify ? "Verify" : "verified"}
+              </Button>
+            </InputRightElement>
+          </InputGroup>
         </FormControl>
         <FormControl id="password" isRequired>
           <FormLabel>Password</FormLabel>
