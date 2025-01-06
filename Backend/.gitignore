@@ -1,4 +1,4 @@
-./controllers/nodemailer.controller.js
+../controllers/nodemailer.controller.js
 
 # Logs
 logs
